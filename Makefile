@@ -1,7 +1,7 @@
 # scripting run
 
 run:
-	echo "Init running...."
+	echo "Running ..."
 	go run cmd/api/main.go
 
 sync:

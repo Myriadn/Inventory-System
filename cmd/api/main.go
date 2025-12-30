@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"project-app-inventory-restapi-golang-anas/config"
 	"project-app-inventory-restapi-golang-anas/internal/handler"
+	"project-app-inventory-restapi-golang-anas/internal/middleware"
 	"project-app-inventory-restapi-golang-anas/internal/repository"
 	"project-app-inventory-restapi-golang-anas/internal/service"
 	"project-app-inventory-restapi-golang-anas/pkg/database"
@@ -15,7 +17,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/zap"
 )
 
@@ -40,25 +42,56 @@ func main() {
 	// Handler
 	authHandler := handler.NewAuthHandler(authService)
 
+	// Middleware auth
+	authMiddleware := middleware.NewAuthMiddleware(userRepo)
+
 	// Setup Router (Chi)
 	r := chi.NewRouter()
 
 	// Middleware Dasar
-	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
-	r.Use(middleware.Logger) // Chi default logger (bisa diganti custom middleware zap nanti)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(chimiddleware.RequestID)
+	r.Use(chimiddleware.RealIP)
+	r.Use(chimiddleware.Logger) // Chi default logger (bisa diganti custom middleware zap nanti)
+	r.Use(chimiddleware.Recoverer)
+	r.Use(chimiddleware.Timeout(60 * time.Second))
 
 	// Test Route
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
 	})
 
-	// TODO: Setup Routes/Handlers disini nanti
+	// Setup Routes
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/register", authHandler.Register)
 		r.Post("/login", authHandler.Login)
+	})
+
+	r.Group(func(r chi.Router) {
+		// Pasang Middleware VerifyToken disini
+		r.Use(authMiddleware.VerifyToken)
+
+		// Contoh Endpoint User Profile (Bisa diakses semua role yang login)
+		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
+			userID := r.Context().Value(middleware.UserIDKey).(int64)
+			role := r.Context().Value(middleware.RoleKey).(string)
+			w.Write([]byte(fmt.Sprintf("Hello User ID: %d, Role: %s", userID, role)))
+		})
+
+		// Admin Only Routes
+		r.Group(func(r chi.Router) {
+			// Pasang Middleware Role Check disini
+			r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+
+			r.Get("/admin-dashboard", func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("Welcome Admin!"))
+			})
+		})
+
+		// Super Admin Only
+		r.Group(func(r chi.Router) {
+			r.Use(authMiddleware.RequireRoles("super_admin"))
+			// Disini nanti tempat CRUD User (Create/Delete Staff)
+		})
 	})
 
 	// Start Server dengan Graceful Shutdown

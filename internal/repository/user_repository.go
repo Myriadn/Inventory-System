@@ -53,3 +53,30 @@ func (r *UserRepository) CreateSession(ctx context.Context, session *entity.Sess
 	_, err := r.db.Exec(ctx, query, session.ID, session.UserID, session.Token, session.ExpiredAt)
 	return err
 }
+
+// Struct bantuan untuk hasil query join
+type SessionResult struct {
+	UserID    int64
+	Role      string
+	ExpiredAt time.Time
+}
+
+func (r *UserRepository) GetSessionByToken(ctx context.Context, token string) (*SessionResult, error) {
+	query := `
+		SELECT s.user_id, s.expired_at, u.role
+		FROM sessions s
+		JOIN users u ON s.user_id = u.id
+		WHERE s.token = $1 AND s.is_revoked = FALSE
+	`
+
+	var result SessionResult
+	err := r.db.QueryRow(ctx, query, token).Scan(&result.UserID, &result.ExpiredAt, &result.Role)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil // Token tidak valid atau sudah direvoke
+		}
+		return nil, err
+	}
+
+	return &result, nil
+}
