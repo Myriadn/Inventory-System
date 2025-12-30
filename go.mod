@@ -4,17 +4,24 @@ go 1.25.3
 
 require (
 	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-playground/validator/v10 v10.30.1
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/spf13/viper v1.21.0
 	go.uber.org/zap v1.27.1
+	golang.org/x/crypto v0.46.0
 )
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/spf13/afero v1.15.0 // indirect

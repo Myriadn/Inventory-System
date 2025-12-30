@@ -6,6 +6,9 @@ import (
 	"os"
 	"os/signal"
 	"project-app-inventory-restapi-golang-anas/config"
+	"project-app-inventory-restapi-golang-anas/internal/handler"
+	"project-app-inventory-restapi-golang-anas/internal/repository"
+	"project-app-inventory-restapi-golang-anas/internal/service"
 	"project-app-inventory-restapi-golang-anas/pkg/database"
 	"project-app-inventory-restapi-golang-anas/pkg/logger"
 	"syscall"
@@ -28,6 +31,15 @@ func main() {
 	db := database.ConnectDB(cfg)
 	defer db.Close()
 
+	// Repository
+	userRepo := repository.NewUserRepository(db)
+
+	// Services
+	authService := service.NewAuthService(userRepo)
+
+	// Handler
+	authHandler := handler.NewAuthHandler(authService)
+
 	// Setup Router (Chi)
 	r := chi.NewRouter()
 
@@ -44,6 +56,10 @@ func main() {
 	})
 
 	// TODO: Setup Routes/Handlers disini nanti
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/register", authHandler.Register)
+		r.Post("/login", authHandler.Login)
+	})
 
 	// Start Server dengan Graceful Shutdown
 	// Ini best practice agar request yang sedang berjalan tidak terputus paksa saat server dimatikan.
