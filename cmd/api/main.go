@@ -54,6 +54,21 @@ func main() {
 	rackService := service.NewRackService(rackRepo)
 	rackHandler := handler.NewRackHandler(rackService)
 
+	// product
+	productRepo := repository.NewProductRepository(db)
+	productService := service.NewProductService(productRepo)
+	productHandler := handler.NewProductHandler(productService)
+
+	// sale
+	saleRepo := repository.NewSaleRepository(db)
+	saleService := service.NewSaleService(saleRepo)
+	saleHandler := handler.NewSaleHandler(saleService)
+
+	// report
+	reportRepo := repository.NewReportRepository(db)
+	reportService := service.NewReportService(reportRepo)
+	reportHandler := handler.NewReportHandler(reportService)
+
 	// Setup Router (Chi)
 	r := chi.NewRouter()
 
@@ -119,6 +134,42 @@ func main() {
 				r.Put("/{id}", rackHandler.Update)
 				r.Delete("/{id}", rackHandler.Delete)
 			})
+		})
+
+		// products
+		r.Route("/products", func(r chi.Router) {
+			// Endpoint khusus Low Stock (Boleh Staff, Admin, SuperAdmin)
+			r.With(authMiddleware.RequireRoles("super_admin", "admin", "staff")).
+				Get("/low-stock", productHandler.GetLowStock)
+
+			// Semua role boleh READ
+			r.Get("/", productHandler.GetAll)
+			r.Get("/{id}", productHandler.GetByID)
+
+			// Hanya Admin & Super Admin boleh Create/Update/Delete
+			r.Group(func(r chi.Router) {
+				r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+				r.Post("/", productHandler.Create)
+				r.Put("/{id}", productHandler.Update)
+				r.Delete("/{id}", productHandler.Delete)
+			})
+		})
+
+		// sale
+		r.Route("/sales", func(r chi.Router) {
+			// Admin & Staff boleh create sale
+			r.Group(func(r chi.Router) {
+				r.Use(authMiddleware.RequireRoles("super_admin", "admin", "staff"))
+
+				r.Post("/", saleHandler.Create)
+			})
+		})
+
+		// reports (Hanya Admin & Super Admin)
+		r.Route("/reports", func(r chi.Router) {
+			r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+
+			r.Get("/dashboard", reportHandler.GetDashboard)
 		})
 
 		// Contoh Endpoint User Profile (Bisa diakses semua role yang login)
