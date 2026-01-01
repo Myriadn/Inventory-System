@@ -33,17 +33,26 @@ func main() {
 	db := database.ConnectDB(cfg)
 	defer db.Close()
 
-	// Repository
+	// User Settings
 	userRepo := repository.NewUserRepository(db)
-
-	// Services
 	authService := service.NewAuthService(userRepo)
-
-	// Handler
 	authHandler := handler.NewAuthHandler(authService)
-
-	// Middleware auth
 	authMiddleware := middleware.NewAuthMiddleware(userRepo)
+
+	// Category
+	categoryRepo := repository.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+
+	// Warehouse
+	warehouseRepo := repository.NewWarehouseRepository(db)
+	warehuseService := service.NewWarehouseService(warehouseRepo)
+	warehouseHandler := handler.NewWarehouseHandler(warehuseService)
+
+	// Racks
+	rackRepo := repository.NewRackRepository(db)
+	rackService := service.NewRackService(rackRepo)
+	rackHandler := handler.NewRackHandler(rackService)
 
 	// Setup Router (Chi)
 	r := chi.NewRouter()
@@ -69,6 +78,48 @@ func main() {
 	r.Group(func(r chi.Router) {
 		// Pasang Middleware VerifyToken disini
 		r.Use(authMiddleware.VerifyToken)
+
+		// categories
+		r.Route("/categories", func(r chi.Router) {
+			// Siapa saja (Admin, Staff) boleh READ
+			r.Get("/", categoryHandler.GetAll)
+			r.Get("/{id}", categoryHandler.GetByID)
+			// Khusus ADMIN & SUPER ADMIN boleh CREATE/UPDATE/DELETE
+			r.Group(func(r chi.Router) {
+				r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+				r.Post("/", categoryHandler.Create)
+				r.Put("/{id}", categoryHandler.Update)
+				r.Delete("/{id}", categoryHandler.Delete)
+			})
+		})
+
+		// warehouse
+		r.Route("/warehouses", func(r chi.Router) {
+			// Siapa saja (Admin, Staff) boleh READ
+			r.Get("/", warehouseHandler.GetAll)
+			r.Get("/{id}", warehouseHandler.GetByID)
+			// Khusus ADMIN & SUPER ADMIN boleh CREATE/UPDATE/DELETE
+			r.Group(func(r chi.Router) {
+				r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+				r.Post("/", warehouseHandler.Create)
+				r.Put("/{id}", warehouseHandler.Update)
+				r.Delete("/{id}", warehouseHandler.Delete)
+			})
+		})
+
+		// racks
+		r.Route("/racks", func(r chi.Router) {
+			// Siapa saja (Admin, Staff) boleh READ
+			r.Get("/", rackHandler.GetAll)
+			r.Get("/{id}", rackHandler.GetByID)
+			// Khusus ADMIN & SUPER ADMIN boleh CREATE/UPDATE/DELETE
+			r.Group(func(r chi.Router) {
+				r.Use(authMiddleware.RequireRoles("super_admin", "admin"))
+				r.Post("/", rackHandler.Create)
+				r.Put("/{id}", rackHandler.Update)
+				r.Delete("/{id}", rackHandler.Delete)
+			})
+		})
 
 		// Contoh Endpoint User Profile (Bisa diakses semua role yang login)
 		r.Get("/profile", func(w http.ResponseWriter, r *http.Request) {
