@@ -4,14 +4,21 @@ import (
 	"context"
 	"errors"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 )
 
-type CategoryService struct {
-	repo *repository.CategoryRepository
+type CategoryRepository interface {
+	Create(ctx context.Context, category *entity.Category) error
+	FindAll(ctx context.Context, limit, offset int) ([]entity.Category, error)
+	FindByID(ctx context.Context, id int64) (*entity.Category, error)
+	Update(ctx context.Context, category *entity.Category) error
+	Delete(ctx context.Context, id int64) error
 }
 
-func NewCategoryService(repo *repository.CategoryRepository) *CategoryService {
+type CategoryService struct {
+	repo CategoryRepository
+}
+
+func NewCategoryService(repo CategoryRepository) *CategoryService {
 	return &CategoryService{repo: repo}
 }
 

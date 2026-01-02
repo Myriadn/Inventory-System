@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 
 	"time"
 
@@ -12,11 +11,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService struct {
-	userRepo *repository.UserRepository
+type UserRepository interface {
+	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
+	CreateUser(ctx context.Context, user *entity.User) error
+	CreateSession(ctx context.Context, session *entity.Session) error
 }
 
-func NewAuthService(userRepo *repository.UserRepository) *AuthService {
+type AuthService struct {
+	userRepo UserRepository
+}
+
+func NewAuthService(userRepo UserRepository) *AuthService {
 	return &AuthService{userRepo: userRepo}
 }
 

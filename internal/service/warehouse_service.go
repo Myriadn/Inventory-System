@@ -4,14 +4,21 @@ import (
 	"context"
 	"errors"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 )
 
-type WarehouseService struct {
-	repo *repository.WarehouseRepository
+type WarehouseRepository interface {
+	Create(ctx context.Context, w *entity.Warehouse) error
+	FindAll(ctx context.Context, limit, offset int) ([]entity.Warehouse, error)
+	FindByID(ctx context.Context, id int64) (*entity.Warehouse, error)
+	Update(ctx context.Context, w *entity.Warehouse) error
+	Delete(ctx context.Context, id int64) error
 }
 
-func NewWarehouseService(repo *repository.WarehouseRepository) *WarehouseService {
+type WarehouseService struct {
+	repo WarehouseRepository
+}
+
+func NewWarehouseService(repo WarehouseRepository) *WarehouseService {
 	return &WarehouseService{repo: repo}
 }
 

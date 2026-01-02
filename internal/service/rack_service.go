@@ -4,14 +4,21 @@ import (
 	"context"
 	"errors"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 )
 
-type RackService struct {
-	repo *repository.RackRepository
+type RackRepository interface {
+	Create(ctx context.Context, r *entity.Rack) error
+	FindAll(ctx context.Context, limit, offset int) ([]entity.Rack, error)
+	FindByID(ctx context.Context, id int64) (*entity.Rack, error)
+	Update(ctx context.Context, r *entity.Rack) error
+	Delete(ctx context.Context, id int64) error
 }
 
-func NewRackService(repo *repository.RackRepository) *RackService {
+type RackService struct {
+	repo RackRepository
+}
+
+func NewRackService(repo RackRepository) *RackService {
 	return &RackService{repo: repo}
 }
 

@@ -7,14 +7,13 @@ import (
 	"project-app-inventory-restapi-golang-anas/internal/entity"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type SaleRepository struct {
-	db *pgxpool.Pool
+	db DBExecutor
 }
 
-func NewSaleRepository(db *pgxpool.Pool) *SaleRepository {
+func NewSaleRepository(db DBExecutor) *SaleRepository {
 	return &SaleRepository{db: db}
 }
 
@@ -92,4 +91,65 @@ func (r *SaleRepository) CreateTransaction(ctx context.Context, sale *entity.Sal
 
 	// Commit Transaksi (Simpan Permanen)
 	return tx.Commit(ctx)
+}
+
+// FindAll mengambil daftar penjualan (Header only)
+func (r *SaleRepository) FindAll(ctx context.Context, limit, offset int) ([]entity.Sale, error) {
+	query := `
+		SELECT id, user_id, transaction_date, total_amount, created_at
+		FROM sales
+		ORDER BY created_at DESC
+		LIMIT $1 OFFSET $2
+	`
+	rows, err := r.db.Query(ctx, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var sales []entity.Sale
+	for rows.Next() {
+		var s entity.Sale
+		if err := rows.Scan(&s.ID, &s.UserID, &s.TransactionDate, &s.TotalAmount, &s.CreatedAt); err != nil {
+			return nil, err
+		}
+		sales = append(sales, s)
+	}
+	return sales, nil
+}
+
+// FindByID mengambil detail penjualan lengkap dengan item barangnya
+func (r *SaleRepository) FindByID(ctx context.Context, id int64) (*entity.Sale, error) {
+	// 1. Ambil Header Sale
+	querySale := `SELECT id, user_id, transaction_date, total_amount, created_at FROM sales WHERE id = $1`
+	var s entity.Sale
+	err := r.db.QueryRow(ctx, querySale, id).Scan(&s.ID, &s.UserID, &s.TransactionDate, &s.TotalAmount, &s.CreatedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	// 2. Ambil Detail Barang (Sale Details)
+	queryDetails := `
+		SELECT id, sale_id, product_id, quantity, unit_price, subtotal
+		FROM sale_details
+		WHERE sale_id = $1
+	`
+	rows, err := r.db.Query(ctx, queryDetails, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var d entity.SaleDetail
+		if err := rows.Scan(&d.ID, &d.SaleID, &d.ProductID, &d.Quantity, &d.UnitPrice, &d.SubTotal); err != nil {
+			return nil, err
+		}
+		s.Details = append(s.Details, d)
+	}
+
+	return &s, nil
 }

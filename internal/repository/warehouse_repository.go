@@ -5,14 +5,13 @@ import (
 	"project-app-inventory-restapi-golang-anas/internal/entity"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type WarehouseRepository struct {
-	db *pgxpool.Pool
+	db DBExecutor
 }
 
-func NewWarehouseRepository(db *pgxpool.Pool) *WarehouseRepository {
+func NewWarehouseRepository(db DBExecutor) *WarehouseRepository {
 	return &WarehouseRepository{db: db}
 }
 
@@ -32,7 +31,7 @@ func (r *WarehouseRepository) FindAll(ctx context.Context, limit, offset int) ([
 	var warehouses []entity.Warehouse
 	for rows.Next() {
 		var w entity.Warehouse
-		if err := rows.Scan(&w.ID, &w.Location, &w.Name, &w.Description, &w.CreatedAt, &w.UpdatedAt); err != nil {
+		if err := rows.Scan(&w.ID, &w.Name, &w.Location, &w.Description, &w.CreatedAt, &w.UpdatedAt); err != nil {
 			return nil, err
 		}
 		warehouses = append(warehouses, w)
@@ -43,7 +42,7 @@ func (r *WarehouseRepository) FindAll(ctx context.Context, limit, offset int) ([
 func (r *WarehouseRepository) FindByID(ctx context.Context, id int64) (*entity.Warehouse, error) {
 	query := `SELECT id, name, location, description, created_at, updated_at FROM warehouses WHERE id = $1`
 	var w entity.Warehouse
-	err := r.db.QueryRow(ctx, query, id).Scan(&w.ID, &w.Location, &w.Name, &w.Description, &w.CreatedAt, &w.UpdatedAt)
+	err := r.db.QueryRow(ctx, query, id).Scan(&w.ID, &w.Name, &w.Location, &w.Description, &w.CreatedAt, &w.UpdatedAt)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			return nil, nil
@@ -54,7 +53,7 @@ func (r *WarehouseRepository) FindByID(ctx context.Context, id int64) (*entity.W
 }
 
 func (r *WarehouseRepository) Update(ctx context.Context, warehouse *entity.Warehouse) error {
-	query := `UPDATE warehouses SET name = $1, location = $2, description = $3, updated_at = NOW() WHERE id = $3`
+	query := `UPDATE warehouses SET name = $1, location = $2, description = $3, updated_at = NOW() WHERE id = $4`
 	cmd, err := r.db.Exec(ctx, query, warehouse.Name, warehouse.Location, warehouse.Description, warehouse.ID)
 	if err != nil {
 		return err

@@ -4,14 +4,22 @@ import (
 	"context"
 	"errors"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 )
 
-type ProductService struct {
-	repo *repository.ProductRepository
+type ProductRepository interface {
+	Create(ctx context.Context, p *entity.Product) error
+	FindAll(ctx context.Context, limit, offset int) ([]entity.Product, error)
+	FindByID(ctx context.Context, id int64) (*entity.Product, error)
+	Update(ctx context.Context, p *entity.Product) error
+	Delete(ctx context.Context, id int64) error
+	FindLowStock(ctx context.Context, threshold int) ([]entity.Product, error)
 }
 
-func NewProductService(repo *repository.ProductRepository) *ProductService {
+type ProductService struct {
+	repo ProductRepository
+}
+
+func NewProductService(repo ProductRepository) *ProductService {
 	return &ProductService{repo: repo}
 }
 

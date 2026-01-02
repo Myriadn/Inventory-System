@@ -5,14 +5,21 @@ import (
 	"project-app-inventory-restapi-golang-anas/internal/entity"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type CategoryRepository struct {
-	db *pgxpool.Pool
+type DBExecutor interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
+	Begin(ctx context.Context) (pgx.Tx, error)
 }
 
-func NewCategoryRepository(db *pgxpool.Pool) *CategoryRepository {
+type CategoryRepository struct {
+	db DBExecutor
+}
+
+func NewCategoryRepository(db DBExecutor) *CategoryRepository {
 	return &CategoryRepository{db: db}
 }
 

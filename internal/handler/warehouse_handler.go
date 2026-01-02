@@ -97,7 +97,7 @@ func (h *WarehouseHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Warehouse updated successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "warehouse updated successfully"})
 }
 
 func (h *WarehouseHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -109,5 +109,5 @@ func (h *WarehouseHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Warehouse deleted successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "warehouse deleted successfully"})
 }

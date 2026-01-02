@@ -39,6 +39,9 @@ func main() {
 	authHandler := handler.NewAuthHandler(authService)
 	authMiddleware := middleware.NewAuthMiddleware(userRepo)
 
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
+
 	// Category
 	categoryRepo := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepo)
@@ -157,11 +160,12 @@ func main() {
 
 		// sale
 		r.Route("/sales", func(r chi.Router) {
-			// Admin & Staff boleh create sale
 			r.Group(func(r chi.Router) {
 				r.Use(authMiddleware.RequireRoles("super_admin", "admin", "staff"))
 
 				r.Post("/", saleHandler.Create)
+				r.Get("/", saleHandler.GetAll)
+				r.Get("/{id}", saleHandler.GetByID)
 			})
 		})
 
@@ -177,6 +181,16 @@ func main() {
 			userID := r.Context().Value(middleware.UserIDKey).(int64)
 			role := r.Context().Value(middleware.RoleKey).(string)
 			w.Write([]byte(fmt.Sprintf("Hello User ID: %d, Role: %s", userID, role)))
+		})
+
+		// ROUTE USERS (Khusus Super Admin)
+		r.Route("/users", func(r chi.Router) {
+			// Pasang gembok: Hanya Super Admin yang boleh masuk
+			r.Use(authMiddleware.RequireRoles("super_admin"))
+
+			r.Get("/", userHandler.GetAll)                // Lihat semua user
+			r.Patch("/{id}/role", userHandler.UpdateRole) // Ganti role user
+			r.Delete("/{id}", userHandler.Delete)         // Hapus user
 		})
 
 		// Admin Only Routes

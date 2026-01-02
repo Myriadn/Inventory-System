@@ -3,15 +3,13 @@ package repository
 import (
 	"context"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type ReportRepository struct {
-	db *pgxpool.Pool
+	db DBExecutor
 }
 
-func NewReportRepository(db *pgxpool.Pool) *ReportRepository {
+func NewReportRepository(db DBExecutor) *ReportRepository {
 	return &ReportRepository{db: db}
 }
 

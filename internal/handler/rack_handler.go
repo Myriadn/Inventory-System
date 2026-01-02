@@ -97,7 +97,7 @@ func (h *RackHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Category updated successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "rack updated successfully"})
 }
 
 func (h *RackHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -109,5 +109,5 @@ func (h *RackHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Category deleted successfully"})
+	json.NewEncoder(w).Encode(map[string]string{"message": "rack deleted successfully"})
 }

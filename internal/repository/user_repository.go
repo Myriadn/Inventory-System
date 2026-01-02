@@ -7,14 +7,20 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type UserRepository struct {
-	db *pgxpool.Pool
+	db DBExecutor
 }
 
-func NewUserRepository(db *pgxpool.Pool) *UserRepository {
+// Struct bantuan untuk hasil query join
+type SessionResult struct {
+	UserID    int64
+	Role      string
+	ExpiredAt time.Time
+}
+
+func NewUserRepository(db DBExecutor) *UserRepository {
 	return &UserRepository{db: db}
 }
 
@@ -54,13 +60,6 @@ func (r *UserRepository) CreateSession(ctx context.Context, session *entity.Sess
 	return err
 }
 
-// Struct bantuan untuk hasil query join
-type SessionResult struct {
-	UserID    int64
-	Role      string
-	ExpiredAt time.Time
-}
-
 func (r *UserRepository) GetSessionByToken(ctx context.Context, token string) (*SessionResult, error) {
 	query := `
 		SELECT s.user_id, s.expired_at, u.role
@@ -79,4 +78,65 @@ func (r *UserRepository) GetSessionByToken(ctx context.Context, token string) (*
 	}
 
 	return &result, nil
+}
+
+// FindAll mengambil semua user dengan pagination
+func (r *UserRepository) FindAll(ctx context.Context, limit, offset int) ([]entity.User, error) {
+	query := `SELECT id, username, email, role, created_at, updated_at FROM users ORDER BY id DESC LIMIT $1 OFFSET $2`
+	rows, err := r.db.Query(ctx, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []entity.User
+	for rows.Next() {
+		var u entity.User
+		// Scan field yang diperlukan (Password hash tidak kita kembalikan demi keamanan)
+		if err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Role, &u.CreatedAt, &u.UpdatedAt); err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
+// FindByID mencari user berdasarkan ID
+func (r *UserRepository) FindByID(ctx context.Context, id int64) (*entity.User, error) {
+	query := `SELECT id, username, email, role, created_at, updated_at FROM users WHERE id = $1`
+	var u entity.User
+	err := r.db.QueryRow(ctx, query, id).Scan(&u.ID, &u.Username, &u.Email, &u.Role, &u.CreatedAt, &u.UpdatedAt)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
+}
+
+// UpdateRole mengubah role user
+func (r *UserRepository) UpdateRole(ctx context.Context, id int64, newRole string) error {
+	query := `UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2`
+	cmd, err := r.db.Exec(ctx, query, newRole, id)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return pgx.ErrNoRows // User tidak ditemukan
+	}
+	return nil
+}
+
+// Delete menghapus user secara permanen
+func (r *UserRepository) Delete(ctx context.Context, id int64) error {
+	query := `DELETE FROM users WHERE id = $1`
+	cmd, err := r.db.Exec(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return pgx.ErrNoRows
+	}
+	return nil
 }

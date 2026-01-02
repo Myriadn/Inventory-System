@@ -5,14 +5,13 @@ import (
 	"project-app-inventory-restapi-golang-anas/internal/entity"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type RackRepository struct {
-	db *pgxpool.Pool
+	db DBExecutor
 }
 
-func NewRackRepository(db *pgxpool.Pool) *RackRepository {
+func NewRackRepository(db DBExecutor) *RackRepository {
 	return &RackRepository{db: db}
 }
 

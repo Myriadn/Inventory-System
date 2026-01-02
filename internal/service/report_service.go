@@ -3,14 +3,17 @@ package service
 import (
 	"context"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
-	"project-app-inventory-restapi-golang-anas/internal/repository"
 )
 
-type ReportService struct {
-	repo *repository.ReportRepository
+type ReportRepository interface {
+	GetDashboardStats(ctx context.Context) (*entity.DashboardReport, error)
 }
 
-func NewReportService(repo *repository.ReportRepository) *ReportService {
+type ReportService struct {
+	repo ReportRepository
+}
+
+func NewReportService(repo ReportRepository) *ReportService {
 	return &ReportService{repo: repo}
 }
 
