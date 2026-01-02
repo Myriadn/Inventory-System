@@ -13,20 +13,15 @@ import (
 )
 
 func TestCategoryRepository_FindByID_Success(t *testing.T) {
-	// 1. Buat Mock DB
 	mock, err := pgxmock.NewPool()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer mock.Close()
 
-	// 2. Inisialisasi Repository dengan Mock
 	repo := NewCategoryRepository(mock)
 
-	// 3. Siapkan Ekspektasi (Mocking Behavior)
-	// Kita pura-pura query dijalankan dan mengembalikan baris data tertentu
 	expectedID := int64(1)
-	// Gunakan regexp.QuoteMeta agar karakter spesial SQL tidak dianggap regex
 	query := regexp.QuoteMeta(`SELECT id, name, description, created_at, updated_at FROM categories WHERE id = $1`)
 
 	rows := mock.NewRows([]string{"id", "name", "description", "created_at", "updated_at"}).
@@ -36,7 +31,6 @@ func TestCategoryRepository_FindByID_Success(t *testing.T) {
 		WithArgs(expectedID).
 		WillReturnRows(rows)
 
-	// Jalankan method yang mau dites
 	category, err := repo.FindByID(context.Background(), expectedID)
 
 	// Assert hasilnya
@@ -44,7 +38,6 @@ func TestCategoryRepository_FindByID_Success(t *testing.T) {
 	assert.NotNil(t, category)
 	assert.Equal(t, "Elektronik", category.Name)
 
-	// Pastikan semua ekspektasi terpenuhi
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -62,10 +55,8 @@ func TestCategoryRepository_Create_Success(t *testing.T) {
 		Description: "Baju dan Celana",
 	}
 
-	// Query INSERT biasanya pakai ExpectQueryRow kalau ada RETURNING
 	query := regexp.QuoteMeta(`INSERT INTO categories (name, description, created_at, updated_at) VALUES ($1, $2, NOW(), NOW()) RETURNING id, created_at, updated_at`)
 
-	// Kita mock return value dari RETURNING
 	mock.ExpectQuery(query).
 		WithArgs(newCategory.Name, newCategory.Description).
 		WillReturnRows(mock.NewRows([]string{"id", "created_at", "updated_at"}).AddRow(int64(10), nil, nil))
@@ -94,14 +85,6 @@ func TestCategoryRepository_FindByID_NotFound(t *testing.T) {
 		WillReturnError(pgx.ErrNoRows) // Atau WillReturnRows(pgxmock.NewRows(...)) kosong
 
 	category, err := repo.FindByID(context.Background(), 999)
-
-	// Sesuai logic kodemu: jika pgx.ErrNoRows, return nil, nil
-	// (Tapi kodemu mengembalikan nil, nil atau error? Mari cek kodemu)
-	// Di kodemu: if err == pgx.ErrNoRows { return nil, nil }
-
-	// Namun pgxmock kadang berperilaku strict.
-	// Jika repo kamu menghandle error pgx.ErrNoRows secara manual di QueryRow(...).Scan,
-	// Kamu perlu memastikan mock mengembalikan error tersebut saat Scan dipanggil.
 
 	assert.NoError(t, err)  // Harusnya tidak error
 	assert.Nil(t, category) // Tapi nil

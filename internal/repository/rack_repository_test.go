@@ -45,7 +45,6 @@ func TestRackRepository_Delete_NotFound(t *testing.T) {
 
 	query := regexp.QuoteMeta(`DELETE FROM racks WHERE id = $1`)
 
-	// Simulasi delete tapi 0 rows affected
 	mock.ExpectExec(query).
 		WithArgs(int64(99)).
 		WillReturnResult(pgxmock.NewResult("DELETE", 0))

@@ -39,17 +39,14 @@ func TestWarehouseService_Full(t *testing.T) {
 	mockRepo := new(MockWarehouseRepo)
 	service := NewWarehouseService(mockRepo)
 
-	// 1. Create
 	mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 	_, err := service.Create(context.Background(), &entity.WarehouseRequest{Name: "Gudang"})
 	assert.NoError(t, err)
 
-	// 2. GetAll
 	mockRepo.On("FindAll", mock.Anything, 10, 0).Return([]entity.Warehouse{}, nil)
 	_, err = service.GetAll(context.Background(), 1, 10)
 	assert.NoError(t, err)
 
-	// 3. GetByID
 	mockRepo.On("FindByID", mock.Anything, int64(1)).Return(&entity.Warehouse{}, nil)
 	_, err = service.GetByID(context.Background(), 1)
 	assert.NoError(t, err)
@@ -58,12 +55,10 @@ func TestWarehouseService_Full(t *testing.T) {
 	_, err = service.GetByID(context.Background(), 99)
 	assert.Error(t, err)
 
-	// 4. Update
 	mockRepo.On("Update", mock.Anything, mock.Anything).Return(nil)
 	err = service.Update(context.Background(), 1, &entity.WarehouseRequest{})
 	assert.NoError(t, err) // ID 1 sudah di-mock return Warehouse di atas
 
-	// 5. Delete
 	mockRepo.On("Delete", mock.Anything, int64(1)).Return(nil)
 	err = service.Delete(context.Background(), 1)
 	assert.NoError(t, err)

@@ -18,17 +18,12 @@ func TestReportRepository_GetDashboardStats(t *testing.T) {
 
 	repo := NewReportRepository(mock)
 
-	// Urutan query harus sesuai dengan logic di repository
-
-	// 1. Count Products
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT COUNT(*) FROM products`)).
 		WillReturnRows(mock.NewRows([]string{"count"}).AddRow(50))
 
-	// 2. Count Sales
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT COUNT(*) FROM sales`)).
 		WillReturnRows(mock.NewRows([]string{"count"}).AddRow(20))
 
-	// 3. Sum Revenue
 	mock.ExpectQuery(regexp.QuoteMeta(`SELECT COALESCE(SUM(total_amount), 0) FROM sales`)).
 		WillReturnRows(mock.NewRows([]string{"sum"}).AddRow(1500000.0))
 

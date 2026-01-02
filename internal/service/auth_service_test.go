@@ -10,7 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Definisikan Mock Repository
 type MockUserRepository struct {
 	mock.Mock
 }
@@ -45,9 +44,8 @@ func TestAuthService_Register_Success(t *testing.T) {
 		Role:     "staff",
 	}
 
-	// Expectation: GetUserByEmail dipanggil dan return nil (user belum ada)
 	mockRepo.On("GetUserByEmail", mock.Anything, req.Email).Return(nil, nil)
-	// Expectation: CreateUser dipanggil dan sukses
+
 	mockRepo.On("CreateUser", mock.Anything, mock.AnythingOfType("*entity.User")).Return(nil)
 
 	err := service.Register(context.Background(), req)
@@ -66,7 +64,6 @@ func TestAuthService_Register_EmailExists(t *testing.T) {
 
 	existingUser := &entity.User{ID: 1, Email: "duplicate@example.com"}
 
-	// Expectation: GetUserByEmail menemukan user
 	mockRepo.On("GetUserByEmail", mock.Anything, req.Email).Return(existingUser, nil)
 
 	err := service.Register(context.Background(), req)
@@ -95,7 +92,6 @@ func TestAuthService_Login_Success(t *testing.T) {
 		Password: password,
 	}
 
-	// Expectation: Cari user ketemu, Cek password ok, Create Session ok
 	mockRepo.On("GetUserByEmail", mock.Anything, req.Email).Return(existingUser, nil)
 	mockRepo.On("CreateSession", mock.Anything, mock.AnythingOfType("*entity.Session")).Return(nil)
 
