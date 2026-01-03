@@ -15,6 +15,7 @@ type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	CreateUser(ctx context.Context, user *entity.User) error
 	CreateSession(ctx context.Context, session *entity.Session) error
+	RevokeSession(ctx context.Context, token string) error
 }
 
 type AuthService struct {
@@ -90,4 +91,8 @@ func (s *AuthService) Login(ctx context.Context, req *entity.LoginRequest) (*ent
 		ExpiredAt: expiredAt.Format(time.RFC3339),
 		Role:      user.Role,
 	}, nil
+}
+
+func (s *AuthService) Logout(ctx context.Context, token string) error {
+	return s.userRepo.RevokeSession(ctx, token)
 }

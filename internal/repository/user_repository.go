@@ -140,3 +140,15 @@ func (r *UserRepository) Delete(ctx context.Context, id int64) error {
 	}
 	return nil
 }
+
+func (r *UserRepository) RevokeSession(ctx context.Context, token string) error {
+	query := `UPDATE sessions SET is_revoked = TRUE WHERE token = $1`
+	cmd, err := r.db.Exec(ctx, query, token)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return pgx.ErrNoRows // Token tidak ditemukan
+	}
+	return nil
+}

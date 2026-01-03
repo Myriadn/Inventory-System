@@ -32,6 +32,11 @@ func (m *MockUserRepository) CreateSession(ctx context.Context, session *entity.
 	return args.Error(0)
 }
 
+func (m *MockUserRepository) RevokeSession(ctx context.Context, token string) error {
+	args := m.Called(ctx, token)
+	return args.Error(0)
+}
+
 // Test Cases
 func TestAuthService_Register_Success(t *testing.T) {
 	mockRepo := new(MockUserRepository)

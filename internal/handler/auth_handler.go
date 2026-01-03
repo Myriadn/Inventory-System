@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"project-app-inventory-restapi-golang-anas/internal/entity"
 	"project-app-inventory-restapi-golang-anas/internal/service"
+	"strings"
 
 	"net/http"
 
@@ -36,7 +37,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.authService.Register(r.Context(), &req); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusConflict)
 		return
 	}
 
@@ -65,4 +66,31 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	// Ambil token dari Header Authorization
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Missing authorization header", http.StatusUnauthorized)
+		return
+	}
+
+	// Format header biasanya "Bearer <token>"
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		http.Error(w, "Invalid token format", http.StatusUnauthorized)
+		return
+	}
+	token := parts[1]
+
+	// Panggil Service Logout
+	if err := h.authService.Logout(r.Context(), token); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Response Sukses
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Logout success"})
 }

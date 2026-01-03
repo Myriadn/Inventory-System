@@ -186,3 +186,21 @@ func TestUserRepository_Delete(t *testing.T) {
 	err = repo.Delete(context.Background(), 1)
 	assert.NoError(t, err)
 }
+
+func TestUserRepository_RevokeSession(t *testing.T) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer mock.Close()
+
+	repo := NewUserRepository(mock)
+	token := "token-to-revoke"
+
+	// Expect Exec UPDATE
+	query := regexp.QuoteMeta(`UPDATE sessions SET is_revoked = TRUE WHERE token = $1`)
+	mock.ExpectExec(query).WithArgs(token).WillReturnResult(pgxmock.NewResult("UPDATE", 1))
+
+	err = repo.RevokeSession(context.Background(), token)
+	assert.NoError(t, err)
+}

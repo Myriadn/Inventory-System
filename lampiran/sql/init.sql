@@ -99,14 +99,3 @@ CREATE INDEX idx_sessions_token ON sessions(token);
 CREATE INDEX idx_products_sku ON products(sku);
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_sales_date ON sales(transaction_date);
-
--- SEED DATA (Data awal untuk Super Admin supaya bisa login pertama kali)
--- Password 'password123' di-hash menggunakan bcrypt (cost 10)
--- Hash ini mungkin berbeda tergantung generator, tapi ini valid untuk bcrypt standard.
-INSERT INTO users (username, email, password_hash, role)
-VALUES (
-    'SuperAdmin',
-    'superadmin@inventory.com',
-    '$2a$10$2.d.w/M7.u7.t.k.h.0.u.e.r.0.h.a.s.h.e.d.p.a.s.s.w.o.r.d', -- GANTI INI DENGAN HASH ASLI DARI KODE GO KAMU NANTI
-    'super_admin'
-);
