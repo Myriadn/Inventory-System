@@ -18,4 +18,4 @@ Atau sebenarnya juga udah siapin scriptnya dengan: `make coverage`
 
 ## Video
 
-[Summary Video](github.com)
+[Summary Video](https://drive.google.com/file/d/1lgwSLw0ojXduknjq62wRvCO9eUCk8hjF/view?usp=sharing)

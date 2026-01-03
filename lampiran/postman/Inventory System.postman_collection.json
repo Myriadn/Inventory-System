@@ -11,13 +11,13 @@
 			"name": "Authentication",
 			"item": [
 				{
-					"name": "Test Register (Success / Failed)",
+					"name": "Register Super Admin",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"username\": \"karyawan1\",\r\n  \"email\": \"awan1@mail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"staff\"\r\n}",
+							"raw": "{\r\n  \"username\": \"experim1\",\r\n  \"email\": \"exp1@mail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"super_admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -38,13 +38,133 @@
 					"response": []
 				},
 				{
-					"name": "Test Login Staff",
+					"name": "Register Admin",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"udang@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
+							"raw": "{\r\n  \"username\": \"exp2\",\r\n  \"email\": \"exp2@mail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Staff",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"exp3\",\r\n  \"email\": \"exp3@mail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"staff\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with wrong email path",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"staff_jam\",\r\n  \"email\": \"jamers@mail.com\",\r\n  \"password\": \"password123\",\r\n  \"role\": \"staff\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login as Super Admin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"if (jsonData.token) {\r",
+									"    // Simpan ke Environment Variable 'token_superAdmin'\r",
+									"    pm.environment.set(\"token_superAdmin\", jsonData.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else if (jsonData.data && jsonData.data.token) {\r",
+									"    pm.environment.set(\"token_superAdmin\", jsonData.data.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else {\r",
+									"    console.log(\"Token not found in response\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"exp1@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -65,13 +185,118 @@
 					"response": []
 				},
 				{
-					"name": "Test Login Admin",
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"if (jsonData.token) {\r",
+									"    // Simpan ke Environment Variable\r",
+									"    pm.environment.set(\"token_admin\", jsonData.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else if (jsonData.data && jsonData.data.token) {\r",
+									"    pm.environment.set(\"token_admin\", jsonData.data.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else {\r",
+									"    console.log(\"Token not found in response\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"email\": \"babon1@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
+							"raw": "{\r\n  \"email\": \"exp2@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login as Staff",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login Successful\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var jsonData = pm.response.json();\r",
+									"\r",
+									"if (jsonData.token) {\r",
+									"    // Simpan ke Environment Variable\r",
+									"    pm.environment.set(\"token_staff\", jsonData.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else if (jsonData.data && jsonData.data.token) {\r",
+									"    pm.environment.set(\"token_staff\", jsonData.data.token);\r",
+									"    console.log(\"Token Super Admin saved!\");\r",
+									"} else {\r",
+									"    console.log(\"Token not found in response\");\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"exp3@mail.com\",\r\n  \"password\": \"password123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -116,19 +341,13 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "083560eb-35b4-4efd-8863-8978acf510dc",
+									"value": "teststs",
 									"type": "string"
 								}
 							]
 						},
 						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer ngawur123",
-								"type": "text"
-							}
-						],
+						"header": [],
 						"url": {
 							"raw": "{{base_url}}/profile",
 							"host": [
@@ -149,7 +368,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "083560eb-35b4-4efd-8863-8978acf510dc",
+									"value": "{{token_staff}}",
 									"type": "string"
 								}
 							]
@@ -167,6 +386,34 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Logout as Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -174,113 +421,243 @@
 			"name": "Categories",
 			"item": [
 				{
-					"name": "Create Categories",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "4d4cf071-6764-405f-9594-24cac439e5b2",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Elektronik\",\r\n    \"description\": \"Barang-barang gadget dan elektronik rumah\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/categories",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"categories"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Categories",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "4d4cf071-6764-405f-9594-24cac439e5b2",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/categories?page=1&limit=5",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"categories"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
+					"name": "Staff",
+					"item": [
+						{
+							"name": "Get All Categories",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "limit",
-									"value": "5"
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Get categories by page and limit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/categories?page=1&limit=5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get ID Categories",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/categories/8",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories",
+										"8"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Role test forbidden (category)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Elektronik\",\r\n    \"description\": \"Barang-barang gadget dan elektronik rumah\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Role test forbidden (category)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "98626510-cee8-4365-ab11-4110e911a647",
-									"type": "string"
+					"name": "Admin / Super Admin",
+					"item": [
+						{
+							"name": "Create Categories",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Exp 2\",\r\n    \"description\": \"Exp 2\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Elektronik\",\r\n    \"description\": \"Barang-barang gadget dan elektronik rumah\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "Updating Categories by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Hiking & Shi\",\r\n    \"description\": \"Alat perlengkapan untuk pergi mendaki gunung\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/categories/6",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories",
+										"6"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/categories",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"categories"
-							]
+						{
+							"name": "Delete Categories by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/categories/10",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories",
+										"10"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -288,113 +665,243 @@
 			"name": "Warehouses",
 			"item": [
 				{
-					"name": "Create Warehouses",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "d2a9e330-834b-41d8-8119-75560cb59182",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/warehouses",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"warehouses"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Warehouses",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "d2a9e330-834b-41d8-8119-75560cb59182",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/warehouses?page=1&limit=5",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"warehouses"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
+					"name": "Staff",
+					"item": [
+						{
+							"name": "Get All Warehouses",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "limit",
-									"value": "5"
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/warehouses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Get Warehouse by Page & limit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/warehouses?page=1&limit=5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get ID Warehouse",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/warehouses/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Role test forbidden (warehouses)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/warehouses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Role test forbidden (warehouses)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "bf8f8227-c8be-40e5-aec8-1c61c91391fb",
-									"type": "string"
+					"name": "Admin/ Super Admin",
+					"item": [
+						{
+							"name": "Create Warehouses",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Warehouse Z\",\r\n    \"location\": \"Nevada\",\r\n    \"description\": \"Area 51\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/warehouses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "Create Warehouses Copy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Warehouse E\",\r\n    \"location\": \"Padang, Sumatra Barat\",\r\n    \"description\": \"Cabang Sumatra bagian Barat\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/warehouses/5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses",
+										"5"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/warehouses",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"warehouses"
-							]
+						{
+							"name": "Delete Warehouse",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/warehouses/7",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"warehouses",
+										"7"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -402,113 +909,243 @@
 			"name": "Racks",
 			"item": [
 				{
-					"name": "Create Racks",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "c070de20-3e3b-4461-963f-58f9bf039173",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Rak B\",\r\n    \"category\": \"Peripheral\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/racks",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"racks"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Racks",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "c070de20-3e3b-4461-963f-58f9bf039173",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/racks?page=1&limit=5",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"racks"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
+					"name": "Staff",
+					"item": [
+						{
+							"name": "Get All Racks",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "limit",
-									"value": "5"
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/racks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Get Racks by Page and Limit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/racks?page=1&limit=5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Racks by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/racks/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Role test forbidden (racks)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/racks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Role test forbidden (racks)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token_staff}}",
-									"type": "string"
+					"name": "Admin / Super Admin",
+					"item": [
+						{
+							"name": "Create Racks",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Rak X\",\r\n    \"category\": \"Nuclear\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/racks",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "Update by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Rak C\",\r\n    \"category\": \"Sepatu fashion\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/racks/3",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks",
+										"3"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/racks",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"racks"
-							]
+						{
+							"name": "Delete By ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/racks/7",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"racks",
+										"7"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -516,77 +1153,243 @@
 			"name": "Products",
 			"item": [
 				{
-					"name": "Create Products",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token_superAdmin}}",
-									"type": "string"
+					"name": "Staff",
+					"item": [
+						{
+							"name": "Get All Products",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/products",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"sku\": \"LAPTOP-002\",\r\n    \"name\": \"ROG Strix G531GD\",\r\n    \"description\": \"Laptop Gaming\",\r\n    \"stock\": 2,\r\n    \"price\": 20000000,\r\n    \"category_id\": 1,\r\n    \"rack_id\": 1,\r\n    \"warehouse_id\": 1\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "Get Product by page and limit",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/products?page=1&limit=5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{base_url}}/products",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"products"
-							]
+						{
+							"name": "Get Products by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/products/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Role test forbidden (Products)",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_staff}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/products",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Get All Products",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token_superAdmin}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{base_url}}/products?page=1&limit=5",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"products"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
+					"name": "Admin / Super Admin",
+					"item": [
+						{
+							"name": "Create Products",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "limit",
-									"value": "5"
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sku\": \"NUC-007\",\r\n    \"name\": \"Nuclear Momentums\",\r\n    \"description\": \"Experimental\",\r\n    \"stock\": 1,\r\n    \"price\": 1000000000,\r\n    \"category_id\": 6,\r\n    \"rack_id\": 1,\r\n    \"warehouse_id\": 5\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/products",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Update Products by ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n        \"sku\": \"LAPTOP-002\",\r\n        \"name\": \"Alienware Laptop\",\r\n        \"description\": \"Laptop Gaming\",\r\n        \"stock\": 2,\r\n        \"price\": 20000000,\r\n        \"category_id\": 1,\r\n        \"rack_id\": 1,\r\n        \"warehouse_id\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/products/12",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products",
+										"12"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete By ID",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{token_superAdmin}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/products/5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"products",
+										"5"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
 					"name": "Low Stock",
@@ -615,42 +1418,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Role test forbidden (Products)",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{token_staff}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Warehouse A\",\r\n    \"location\": \"Jl. Ujung Harapan Kel, RT.001/RW.015, Kaliabang Tengah\",\r\n    \"description\": \"Tempat penitipan Barang-barang\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/products",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"products"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -674,7 +1441,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"items\": [\r\n        {\"product_id\": 1, \"quantity\": 3}\r\n    ]\r\n}",
+							"raw": "{\r\n    \"items\": [\r\n        {\"product_id\": 6, \"quantity\": 1}\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -710,7 +1477,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"items\": [\r\n        {\"product_id\": 1, \"quantity\": 20}\r\n    ]\r\n}",
+							"raw": "{\r\n    \"items\": [\r\n        {\"product_id\": 6, \"quantity\": 5}\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -782,13 +1549,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/sales/1",
+							"raw": "{{base_url}}/sales/3",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"sales",
-								"1"
+								"3"
 							]
 						}
 					},
@@ -941,13 +1708,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/users/5",
+							"raw": "{{base_url}}/users/4",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"users",
-								"5"
+								"4"
 							]
 						}
 					},
